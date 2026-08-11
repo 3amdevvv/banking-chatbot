@@ -1,0 +1,313 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f7fb;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* ---------------------------------------
+   HEADER
+--------------------------------------- */
+
+.header {
+  height: 75px;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 30px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.header p {
+  margin: 4px 0 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+
+/* ---------------------------------------
+   CLEAR BUTTON
+--------------------------------------- */
+
+.clear-button {
+  border: none;
+  background: #f3f4f6;
+  padding: 9px 15px;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+}
+
+.clear-button:hover {
+  background: #e5e7eb;
+}
+
+
+/* ---------------------------------------
+   CHAT
+--------------------------------------- */
+
+.chat-container {
+  flex: 1;
+
+  width: 100%;
+  max-width: 900px;
+
+  margin: auto;
+
+  padding: 30px 20px 120px;
+}
+
+
+/* ---------------------------------------
+   MESSAGE ROW
+--------------------------------------- */
+
+.message-row {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.user-row {
+  justify-content: flex-end;
+}
+
+.assistant-row {
+  justify-content: flex-start;
+}
+
+
+/* ---------------------------------------
+   MESSAGE
+--------------------------------------- */
+
+.message {
+  max-width: 75%;
+
+  padding: 14px 17px;
+
+  border-radius: 14px;
+
+  line-height: 1.6;
+
+  white-space: pre-wrap;
+}
+
+.user-message {
+  background: #2563eb;
+  color: white;
+
+  border-bottom-right-radius: 4px;
+}
+
+.assistant-message {
+  background: white;
+  color: #111827;
+
+  border: 1px solid #e5e7eb;
+
+  border-bottom-left-radius: 4px;
+}
+
+
+/* ---------------------------------------
+   SOURCES
+--------------------------------------- */
+
+.sources {
+  margin-top: 14px;
+
+  border-top: 1px solid #e5e7eb;
+
+  padding-top: 10px;
+}
+
+.sources-title {
+  font-size: 12px;
+
+  font-weight: bold;
+
+  color: #6b7280;
+
+  margin-bottom: 7px;
+}
+
+.source {
+  display: flex;
+  flex-direction: column;
+
+  margin-bottom: 7px;
+
+  font-size: 11px;
+}
+
+.source strong {
+  color: #374151;
+}
+
+.source span {
+  color: #6b7280;
+}
+
+
+/* ---------------------------------------
+   INPUT
+--------------------------------------- */
+
+.input-area {
+  position: fixed;
+
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  background: white;
+
+  border-top: 1px solid #e5e7eb;
+
+  padding: 15px 20px;
+}
+
+.input-container {
+  max-width: 900px;
+
+  margin: auto;
+
+  display: flex;
+
+  gap: 10px;
+}
+
+.input-container textarea {
+  flex: 1;
+
+  resize: none;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 10px;
+
+  padding: 12px;
+
+  font-size: 15px;
+
+  outline: none;
+}
+
+.input-container textarea:focus {
+  border-color: #2563eb;
+}
+
+.input-container button {
+  width: 80px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background: #2563eb;
+
+  color: white;
+
+  cursor: pointer;
+}
+
+.input-container button:disabled {
+  background: #9ca3af;
+
+  cursor: not-allowed;
+}
+
+.input-hint {
+  max-width: 900px;
+
+  margin: 5px auto 0;
+
+  font-size: 11px;
+
+  color: #9ca3af;
+}
+
+
+/* ---------------------------------------
+   TYPING INDICATOR
+--------------------------------------- */
+
+.typing {
+  display: flex;
+
+  gap: 4px;
+}
+
+.typing span {
+  width: 7px;
+  height: 7px;
+
+  background: #9ca3af;
+
+  border-radius: 50%;
+
+  animation: typing 1.2s infinite;
+}
+
+.typing span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+  }
+
+  30% {
+    opacity: 1;
+  }
+}
+
+
+/* ---------------------------------------
+   MOBILE
+--------------------------------------- */
+
+@media (max-width: 600px) {
+
+  .header {
+    padding: 0 15px;
+  }
+
+  .message {
+    max-width: 90%;
+  }
+
+  .chat-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+}
