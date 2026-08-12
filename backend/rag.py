@@ -5,12 +5,16 @@ import re
 
 class BankingRAG:
 
-    def __init__(self, data_path: str):
+    def __init__(self, data_path):
 
         self.data_path = data_path
         self.documents = []
 
         self.load_data()
+
+        print(
+            f"RAG loaded {len(self.documents)} documents"
+        )
 
     # --------------------------------------------------
     # LOAD DATA
@@ -19,6 +23,7 @@ class BankingRAG:
     def load_data(self):
 
         if not os.path.exists(self.data_path):
+
             raise FileNotFoundError(
                 f"Dataset not found: {self.data_path}"
             )
@@ -31,9 +36,6 @@ class BankingRAG:
 
             content = file.read()
 
-        records = []
-
-        # Try normal JSON
         try:
 
             data = json.loads(content)
@@ -41,12 +43,13 @@ class BankingRAG:
             if isinstance(data, list):
                 records = data
 
-            elif isinstance(data, dict):
+            else:
                 records = [data]
 
         except json.JSONDecodeError:
 
-            # JSONL fallback
+            records = []
+
             for line in content.splitlines():
 
                 line = line.strip()
@@ -63,103 +66,60 @@ class BankingRAG:
                 except json.JSONDecodeError:
                     continue
 
-        print(
-            f"Loaded {len(records)} records"
-        )
-
-        # --------------------------------------------------
-        # Store only fields required by the chatbot
-        # --------------------------------------------------
-
         for record in records:
 
-            searchable_text = record.get(
-                "row_searchable_text",
-                ""
-            )
+            self.documents.append({
 
-            if not searchable_text:
-
-                searchable_text = " ".join([
-                    str(record.get(
+                "user_query":
+                    record.get(
                         "user_query",
                         ""
-                    )),
+                    ),
 
-                    str(record.get(
-                        "original_context",
-                        ""
-                    )),
-
-                    str(record.get(
-                        "answer_guidance",
-                        ""
-                    )),
-
-                    str(record.get(
+                "combined_completion":
+                    record.get(
                         "combined_completion",
                         ""
-                    )),
+                    ),
 
-                    str(record.get(
+                "answer_guidance":
+                    record.get(
+                        "answer_guidance",
+                        ""
+                    ),
+
+                "domain_category":
+                    record.get(
                         "domain_category",
                         ""
-                    )),
+                    ),
 
-                    str(record.get(
+                "subdomain":
+                    record.get(
                         "subdomain",
                         ""
-                    ))
-                ])
+                    ),
 
-            self.documents.append({
-                "user_query": record.get(
-                    "user_query",
-                    ""
-                ),
-
-                "combined_completion": record.get(
-                    "combined_completion",
-                    ""
-                ),
-
-                "answer_guidance": record.get(
-                    "answer_guidance",
-                    ""
-                ),
-
-                "domain_category": record.get(
-                    "domain_category",
-                    ""
-                ),
-
-                "subdomain": record.get(
-                    "subdomain",
-                    ""
-                ),
-
-                "original_context": record.get(
-                    "original_context",
-                    ""
-                ),
-
-                "searchable_text": searchable_text
+                "original_context":
+                    record.get(
+                        "original_context",
+                        ""
+                    )
             })
 
     # --------------------------------------------------
     # TOKENIZE
     # --------------------------------------------------
 
-    def tokenize(self, text):
+    @staticmethod
+    def tokenize(text):
 
-        text = text.lower()
-
-        words = re.findall(
-            r"[a-zA-Z0-9]+",
-            text
+        return set(
+            re.findall(
+                r"[a-zA-Z0-9]+",
+                text.lower()
+            )
         )
-
-        return set(words)
 
     # --------------------------------------------------
     # SEARCH
@@ -167,30 +127,40 @@ class BankingRAG:
 
     def search(
         self,
-        query: str,
-        top_k: int = 5
+        query,
+        top_k=5
     ):
 
-        query_words = self.tokenize(query)
+        query_words = self.tokenize(
+            query
+        )
 
         if not query_words:
             return []
 
-        scored_documents = []
+        results = []
 
         for document in self.documents:
 
-            document_words = self.tokenize(
-                document["searchable_text"]
-            )
+            searchable_text = " ".join([
+                document["user_query"],
+                document["answer_guidance"],
+                document["original_context"],
+                document["domain_category"],
+                document["subdomain"]
+            ])
 
-            if not document_words:
-                continue
+            document_words = self.tokenize(
+                searchable_text
+            )
 
             common_words = (
                 query_words &
                 document_words
             )
+
+            if not common_words:
+                continue
 
             score = (
                 len(common_words)
@@ -198,21 +168,15 @@ class BankingRAG:
                 len(query_words)
             )
 
-            if score > 0:
+            result = document.copy()
 
-                result = document.copy()
+            result["score"] = score
 
-                result["score"] = score
+            results.append(result)
 
-                scored_documents.append(
-                    result
-                )
-
-        # Highest score first
-
-        scored_documents.sort(
+        results.sort(
             key=lambda x: x["score"],
             reverse=True
         )
 
-        return scored_documents[:top_k]
+        return results[:top_k]
