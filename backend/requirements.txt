@@ -2,5 +2,3 @@ fastapi
 uvicorn
 google-genai
 python-dotenv
-numpy
-scikit-learn
