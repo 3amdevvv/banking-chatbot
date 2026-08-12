@@ -44,7 +44,7 @@ app.add_middleware(
 DATA_PATH = os.path.join(
     os.path.dirname(__file__),
     "data",
-    "data.json"
+    "data_small.json"
 )
 
 
